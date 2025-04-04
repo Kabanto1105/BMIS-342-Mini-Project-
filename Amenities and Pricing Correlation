@@ -1,0 +1,60 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+file_path = r"C:\Users\katey\Downloads\clean_listings.csv"
+listings = pd.read_csv(file_path)
+listings.head(10)
+
+listings.info()
+
+listings = listings.drop(columns=[col for col in listings.columns if col.startswith("has_")], errors='ignore')
+
+target_amenities = ['Wifi', 'Air conditioning', 'Kitchen', 'Coffee Maker', 'Patio or Balcony', 'Dedicated Workspace']
+
+for amenity in target_amenities:
+    col_name = 'has_' + amenity.lower().replace(" ", "_")
+    listings[col_name] = listings['amenities'].str.contains(amenity, case=False).astype(int)
+
+cols_to_print = ['price'] + ['has_' + amenity.lower().replace(" ", "_") for amenity in target_amenities]
+print(listings[cols_to_print].head())
+
+listings[['price', 'has_wifi', 'has_air_conditioning','has_kitchen', 'has_coffee_maker', 'has_patio_or_balcony', 'has_dedicated_workspace']].corr()
+
+listings[['price','has_wifi','has_air_conditioning', 'has_kitchen', 'has_coffee_maker', 'has_patio_or_balcony', 'has_dedicated_workspace']].hist(bins=3,
+                                        figsize=(20,15))
+plt.show();
+
+from sklearn.model_selection import train_test_split
+X = listings[['has_wifi','has_air_conditioning', 'has_kitchen', 'has_coffee_maker', 'has_patio_or_balcony','has_dedicated_workspace']]
+y = listings['price']
+
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size = 0.3, random_state = 1)
+
+X_test_const = np.c_[np.ones(X_test.shape[0]), X_test]
+
+y_pred = X_test_const @ beta
+
+plt.figure(figsize=(10, 6))
+plt.scatter(y_test, y_pred, color='blue', alpha=0.5)
+plt.xlabel('Actual Price')
+plt.ylabel('Predicted Price')
+plt.title('Actual vs Predicted Prices')
+
+
+plt.xlim(0,2000)
+plt.xlim(0,2000)
+
+plt.show()
+
+from sklearn.linear_model import LinearRegression
+X = listings[['has_wifi','has_air_conditioning','has_kitchen','has_coffee_maker','has_patio_or_balcony',
+             'has_dedicated_workspace']]
+y = listings['price']
+
+linear_regress = LinearRegression()
+linear_regress.fit(X,y)
+
+print(linear_regress.intercept_)
+print(linear_regress.coef_)
