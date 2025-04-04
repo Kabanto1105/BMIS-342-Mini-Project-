@@ -1,1 +1,44 @@
-ttttt
+import pandas as pd
+import matplotlib.pyplot as plt
+
+calendar_df = pd.read_csv('calendar.csv', low_memory=False, usecols = ['listing_id', 'date', 'booked_days'])
+
+calendar_df['date'] = pd.to_datetime(calendar_df['date'])
+calendar_df['month'] = calendar_df['date'].dt.month_name()
+calendar_df['monthnum'] = calendar_df['date'].dt.month
+calendar_df.sort_values('monthnum', inplace=True)
+
+print(calendar_df.groupby(['month'])['booked_days'].sum())
+print(calendar_df.groupby('month')['booked_days'].mean())
+      
+#Want plots to be in chronological order instead of alphabetical, and after doing some research this seemed like a possible solution.
+month_order = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+calendar_df['month'] = pd.Categorical(calendar_df['month'], categories=month_order, ordered=True)
+
+calendar_df.groupby('month', observed=False)['booked_days'].sum().plot(kind='bar') ##Don't really understand Observed, but got a warning when I ran my code
+                                                                                    #That I should set it to False or True Explicitly, so I did.
+
+plt.xlabel('Month')
+plt.ylabel('Days Occupied')
+plt.title('Sum Of Day\'s Listings Were Occupied By Month')
+
+plt.tight_layout()
+plt.show()
+
+##########Doing something different here than above plot, because matplotlib makes formatting weird and 
+#doesn't show every month on the x axis when using the above method.
+
+monthly_avg = calendar_df.groupby('month', observed=False)['booked_days'].mean()
+monthly_avg = monthly_avg.reindex(month_order)
+
+fig, ax = plt.subplots(figsize=(10, 5))
+ax.plot(month_order, monthly_avg, marker='o')
+
+ax.set_xlabel('Month')
+ax.set_ylabel('Occupancy By Month')
+ax.set_title('Average Number Of Days Occupied Per Month')
+ax.grid(True)
+
+plt.tight_layout()
+plt.show()
