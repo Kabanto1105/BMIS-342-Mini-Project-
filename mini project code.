@@ -1,0 +1,107 @@
+#Data_clean#
+
+import pandas as pd
+
+listings_df = pd.read_csv('Listings.csv')
+columns = listings_df.columns
+listings_df.info()
+
+listings_df = pd.read_csv('Listings.csv') ##put in again in case you want to change and rerun stuff without loading first box
+#Big Block Of Column Deleting
+###########################################################################################################################################################
+print('Dropping URL\'s')
+for i in columns:  
+    if i.find('url') != -1:
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+        
+print()
+print('Dropping ID\'s')
+for i in columns:  
+    if i.find('id') != -1:
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+        
+print()
+print('Dropping Names')
+for i in columns:  
+    if i.find('name') != -1:
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+        
+print() 
+print('Dropping Night\'s')
+for i in columns:  
+    if i.find('night') != -1 and i != 'minimum_nights':
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+        
+print()  
+print('Dropping Reviews')
+for i in columns:
+    if i.find('review') != -1 and i != 'review_scores_rating' and i != 'number_of_reviews':
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+        
+print()       
+print('Dropping Hosts')
+for i in columns:
+    if (i.find('host') != -1
+    and i.find('id') == -1
+    and i.find('url') == -1
+    and i.find('name') == -1
+    and i != 'host_is_superhost'
+    and i != 'host_total_listings_count'
+    and i != 'host_has_profile_pic'):
+        print(i)
+        listings_df.drop([i],axis=1, inplace=True)
+print()     
+print('Dropping Scrapes')
+for i in columns:
+    if (i.find('scrape') != -1
+        and i.find('id') == -1
+        and i.find('url') == -1
+        and i.find('name') == -1):
+            print(i)
+            listings_df.drop([i],axis=1, inplace=True)
+#print(listings_df[['neighbourhood', 'neighbourhood_cleansed', 'neighbourhood_group_cleansed','neighborhood_overview']])
+print()
+print('Dropping Neighborhoods')
+for i in columns:
+    if (i.find('neigh') != -1
+        and i.find('host') == -1
+        and i.find('id') == -1
+        and i.find('url') == -1
+        and i.find('name') == -1
+        and i != 'neighbourhood_group_cleansed'):
+            print(i)
+            listings_df.drop([i],axis=1, inplace=True)
+print()
+print('Dropping Availabilities')
+for i in columns:
+    if (i.find('availa') != -1
+        and i.find('host') == -1
+        and i.find('id') == -1
+        and i.find('url') == -1
+        and i.find('name') == -1
+        and i != 'availability_365'):
+            print(i)
+            listings_df.drop([i],axis=1, inplace=True)
+
+listings_df.drop(['license', 'latitude', 'longitude', 'bathrooms_text', 'license', 'source',
+                  'description', 'calendar_updated', 'property_type'],axis=1, inplace=True)
+###########################################################################################################################################################
+
+listings_df.dropna(inplace=True) #This Removes Remaining Null Values
+
+
+#Apply Some Lamda functions to change object types, many to Bool, 1 to float, 1 to int
+listings_df['host_is_superhost'] = listings_df['host_is_superhost'].apply(lambda x: True if x == 't' else False)
+listings_df['host_has_profile_pic'] = listings_df['host_has_profile_pic'].apply(lambda x: True if x == 't' else False)
+listings_df['instant_bookable'] = listings_df['instant_bookable'].apply(lambda x: True if x == 't' else False)
+
+listings_df['price'] = listings_df['price'].apply(lambda x: x[1:].replace(',','') if x[0] == '$' else x).astype('float')
+listings_df['estimated_occupancy_l365d'] = listings_df['estimated_occupancy_l365d'].astype(int)
+
+#Finished Cleaning, Now Check Data
+clean_df = listings_df
