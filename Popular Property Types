@@ -1,0 +1,48 @@
+### Property type Code ###
+import pandas as pd 
+import numpy as np
+import matplotlib.pyplot as plt 
+import seaborn as sns
+
+###load in the data ### 
+listings_df = pd.read_csv('clean_listings.csv')
+listings_df.info()
+
+### Property Types by district in Barcelona ###
+room_counts = listings_df.groupby(
+    ['neighbourhood_group_cleansed', 'room_type']
+).size().reset_index(name='count')
+
+# Sort by neighborhood and descending count
+room_counts = room_counts.sort_values(
+    ['neighbourhood_group_cleansed', 'count'],
+    ascending=[True, False]
+)
+top_room_type_per_neighborhood = room_counts.loc[
+    room_counts.groupby(['neighbourhood_group_cleansed','room_type'])['count'].idxmax()
+].reset_index(drop=True)
+
+top_room_type_per_neighborhood
+
+# Set up the figure
+plt.figure(figsize=(12, 8))
+
+# Create the bar plot
+sns.barplot(
+    data=top_room_type_per_neighborhood,
+    x='count',
+    y='neighbourhood_group_cleansed',
+    hue='room_type',
+    palette='viridis'
+)
+
+# Formatting
+plt.title("Most Common Airbnb Room Types by District in Barcelona", fontsize=14)
+plt.xlabel("Number of Listings", fontsize=12)
+plt.ylabel("Neighborhood District", fontsize=12)
+plt.legend(title="Room Type", fontsize=10, loc = 'lower right')
+plt.grid(axis="x", linestyle="--", alpha=0.7)
+plt.tight_layout()
+
+# Show the plot
+plt.show()
