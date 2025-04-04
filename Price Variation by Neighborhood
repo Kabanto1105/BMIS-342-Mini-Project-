@@ -14,7 +14,7 @@ price_by_neighborhood = df.groupby('neighbourhood_group_cleansed')['price'].mean
 # Sort the data by price in descending order to show neighborhoods with the highest average price
 price_by_neighborhood_sorted = price_by_neighborhood.sort_values('price', ascending=False)
 
-# Display the top 10 neighborhoods with the highest average price
+# Display the top neighborhoods with the highest average price
 print("Top 10 neighborhoods with the highest average price")
 print(price_by_neighborhood_sorted.head(15))
 
